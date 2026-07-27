@@ -149,7 +149,7 @@ Production smoke-test выполняется после замены шести 
 ''')
 
 pattern = r"def update_documents\(source_hashes: dict\[str, str\]\) -> None:.*?(?=def rebuild_preview\(\) -> None:)"
-fixed, count = re.subn(pattern, replacement, text, flags=re.S)
+fixed, count = re.subn(pattern, lambda _: replacement, text, flags=re.S)
 if count != 1:
     raise SystemExit(f"Could not repair update_documents; replacements={count}")
 compile(fixed, str(target), "exec")
