@@ -1,0 +1,8 @@
+<link rel="canonical" href="https://eksamio.ru/ege/matematika-profil/demoversiya/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://eksamio.ru/ege/matematika-profil/demoversiya/">
+<meta property="og:title" content="Интерактивная демоверсия ЕГЭ по профильной математике">
+<meta property="og:description" content="Экзаменационный режим, таймер, сохранение решений и разбор заданий 1–19.">
+<meta property="og:site_name" content="Эксамио">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Интерактивная демоверсия ЕГЭ по профильной математике","url":"https://eksamio.ru/ege/matematika-profil/demoversiya/","inLanguage":"ru","educationalLevel":"11 класс","learningResourceType":"Интерактивная демоверсия экзамена","provider":{"@type":"Organization","name":"Эксамио","url":"https://eksamio.ru/"}}</script>

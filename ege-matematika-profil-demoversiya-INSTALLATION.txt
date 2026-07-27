@@ -1,0 +1,17 @@
+УСТАНОВКА В TILDA
+
+Страница: https://eksamio.ru/ege/matematika-profil/demoversiya/
+
+Вставьте в шесть последовательных блоков T123:
+1. ege-matematika-profil-demoversiya-T123-01.txt
+2. ege-matematika-profil-demoversiya-T123-02.txt
+3. ege-matematika-profil-demoversiya-T123-03.txt
+4. ege-matematika-profil-demoversiya-T123-04.txt
+5. ege-matematika-profil-demoversiya-T123-05.txt
+6. ege-matematika-profil-demoversiya-T123-06.txt
+
+SEO перенесите из SEO.txt. HEAD.txt вставьте в дополнительный HEAD страницы.
+
+После публикации обязательно проверить старт, таймер, продолжение после перезагрузки, все варианты «ИЛИ», итог 32/32, ширины 320/360/390/768/1280 и отсутствие конфликтов со стилями Tilda.
+
+Статус пакета: READY_FOR_TILDA_TEST. Статус PUBLISHED_READY присваивается только после проверки опубликованной страницы.
