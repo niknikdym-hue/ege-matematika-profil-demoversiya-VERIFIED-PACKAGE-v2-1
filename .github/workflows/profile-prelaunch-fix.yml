@@ -1,0 +1,52 @@
+name: Profile mathematics prelaunch fixes
+
+on:
+  pull_request:
+    paths:
+      - scripts/extract_profile_pdf.py
+      - scripts/run-profile-fix.trigger
+      - .github/workflows/profile-prelaunch-fix.yml
+  push:
+    branches:
+      - fix/prelaunch-profile-math-v2-1
+    paths:
+      - scripts/extract_profile_pdf.py
+      - scripts/run-profile-fix.trigger
+      - .github/workflows/profile-prelaunch-fix.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract-final-criteria:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out fix branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PDF reader
+        run: pip install pypdf
+
+      - name: Extract final PDF text
+        run: python scripts/extract_profile_pdf.py
+
+      - name: Commit extracted criteria text
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/profile_pdf_text.txt
+          if git diff --cached --quiet; then
+            echo "No extraction changes."
+          else
+            git commit -m "Extract final profile mathematics criteria"
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
+          fi
