@@ -3,15 +3,19 @@ name: Profile mathematics prelaunch fixes
 on:
   pull_request:
     paths:
-      - scripts/extract_profile_pdf.py
+      - scripts/apply_profile_fix.py
+      - scripts/repair_and_run_profile_fix.py
       - scripts/run-profile-fix.trigger
+      - tests/profile_fix_browser_test.mjs
       - .github/workflows/profile-prelaunch-fix.yml
   push:
     branches:
       - fix/prelaunch-profile-math-v2-1
     paths:
-      - scripts/extract_profile_pdf.py
+      - scripts/apply_profile_fix.py
+      - scripts/repair_and_run_profile_fix.py
       - scripts/run-profile-fix.trigger
+      - tests/profile_fix_browser_test.mjs
       - .github/workflows/profile-prelaunch-fix.yml
   workflow_dispatch:
 
@@ -19,7 +23,7 @@ permissions:
   contents: write
 
 jobs:
-  extract-final-criteria:
+  apply-and-test:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -44,15 +48,54 @@ jobs:
       - name: Install PDF reader
         run: pip install pypdf
 
-      - name: Extract final PDF text
-        run: python scripts/extract_profile_pdf.py
-
-      - name: Commit extracted criteria text
+      - name: Download official FIPI 2026 mathematics package
         run: |
-          git add scripts/profile_pdf_text.txt
+          curl --fail --location --retry 4 --retry-delay 3 \
+            --output /tmp/ma_11_2026.zip \
+            https://doc.fipi.ru/ege/demoversii-specifikacii-kodifikatory/2026/ma_11_2026.zip
+          python -m zipfile -t /tmp/ma_11_2026.zip
+
+      - name: Apply all Codex audit fixes
+        env:
+          FIPI_ZIP: /tmp/ma_11_2026.zip
+        run: python scripts/repair_and_run_profile_fix.py
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install browser test dependency
+        run: npm install --no-save jsdom@26
+
+      - name: Run browser smoke test
+        run: node tests/profile_fix_browser_test.mjs
+
+      - name: Validate package files
+        run: |
+          git diff --check
+          python -m zipfile -t ege-matematika-profil-demoversiya-VERIFIED-PACKAGE-v2-1-fixed.zip
+          python -m py_compile scripts/apply_profile_fix.py scripts/repair_and_run_profile_fix.py
+          grep -q 'source/ege-2026-matematika-profil-demoversiya.pdf' ege-matematika-profil-demoversiya-MANIFEST.txt
+          grep -q 'source/ege-2026-matematika-profil-specifikatsiya.pdf' ege-matematika-profil-demoversiya-MANIFEST.txt
+          grep -q 'source/ege-2026-matematika-kodifikator.pdf' ege-matematika-profil-demoversiya-MANIFEST.txt
+          test ! -e official-FIPI-demo-2026-profile-math.pdf
+
+      - name: Commit corrected package
+        run: |
+          rm -rf node_modules package-lock.json package.json
+          git add -A
           if git diff --cached --quiet; then
-            echo "No extraction changes."
+            echo "No changes were required."
           else
-            git commit -m "Extract final profile mathematics criteria"
+            git commit -m "Fix profile mathematics prelaunch audit findings"
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
           fi
-          git push origin HEAD:${{ github.head_ref || github.ref_name }}
+
+      - name: Upload corrected ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: ege-matematika-profil-demoversiya-v2-1-fixed
+          path: ege-matematika-profil-demoversiya-VERIFIED-PACKAGE-v2-1-fixed.zip
+          if-no-files-found: error
+          retention-days: 30
