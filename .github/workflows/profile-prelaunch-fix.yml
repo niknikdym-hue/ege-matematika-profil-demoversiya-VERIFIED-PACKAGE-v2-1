@@ -56,23 +56,39 @@ jobs:
           python -m zipfile -t /tmp/ma_11_2026.zip
 
       - name: Apply all Codex audit fixes
+        id: apply
+        continue-on-error: true
         env:
           FIPI_ZIP: /tmp/ma_11_2026.zip
-        run: python scripts/repair_and_run_profile_fix.py
+        run: python scripts/repair_and_run_profile_fix.py > profile-fix-error.log 2>&1
+
+      - name: Save diagnostic on correction failure
+        if: steps.apply.outcome == 'failure'
+        run: |
+          cat profile-fix-error.log
+          git add scripts/apply_profile_fix.py profile-fix-error.log
+          git commit -m "Record profile mathematics correction diagnostic"
+          git push origin HEAD:${{ github.head_ref || github.ref_name }}
+          exit 1
 
       - name: Set up Node
+        if: steps.apply.outcome == 'success'
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
       - name: Install browser test dependency
+        if: steps.apply.outcome == 'success'
         run: npm install --no-save jsdom@26
 
       - name: Run browser smoke test
+        if: steps.apply.outcome == 'success'
         run: node tests/profile_fix_browser_test.mjs
 
       - name: Validate package files
+        if: steps.apply.outcome == 'success'
         run: |
+          rm -f profile-fix-error.log
           git diff --check
           python -m zipfile -t ege-matematika-profil-demoversiya-VERIFIED-PACKAGE-v2-1-fixed.zip
           python -m py_compile scripts/apply_profile_fix.py scripts/repair_and_run_profile_fix.py
@@ -82,8 +98,9 @@ jobs:
           test ! -e official-FIPI-demo-2026-profile-math.pdf
 
       - name: Commit corrected package
+        if: steps.apply.outcome == 'success'
         run: |
-          rm -rf node_modules package-lock.json package.json
+          rm -rf node_modules package-lock.json package.json profile-fix-error.log
           git add -A
           if git diff --cached --quiet; then
             echo "No changes were required."
@@ -93,6 +110,7 @@ jobs:
           fi
 
       - name: Upload corrected ZIP
+        if: steps.apply.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: ege-matematika-profil-demoversiya-v2-1-fixed
