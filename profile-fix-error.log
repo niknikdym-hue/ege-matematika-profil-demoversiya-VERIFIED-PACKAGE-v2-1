@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "/home/runner/work/ege-matematika-profil-demoversiya-VERIFIED-PACKAGE-v2-1/ege-matematika-profil-demoversiya-VERIFIED-PACKAGE-v2-1/scripts/repair_and_run_profile_fix.py", line 155, in <module>
-    compile(fixed, str(target), "exec")
-  File "/home/runner/work/ege-matematika-profil-demoversiya-VERIFIED-PACKAGE-v2-1/ege-matematika-profil-demoversiya-VERIFIED-PACKAGE-v2-1/scripts/apply_profile_fix.py", line 373
-    payload = json.dumps(evidence, ensure_ascii=False, indent=2) + "
-                                                                   ^
-SyntaxError: unterminated string literal (detected at line 373)
