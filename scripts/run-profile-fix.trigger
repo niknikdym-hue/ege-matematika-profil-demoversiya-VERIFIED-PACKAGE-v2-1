@@ -1,1 +1,1 @@
-Extract final criteria for Codex audit dated 2026-07-26.
+Run profile mathematics final source-fidelity audit export 2026-08-09.
